@@ -1,128 +1,152 @@
-## Laboratory work III
+## Laboratory work IV
 
-Данная лабораторная работа посвещена изучению систем контроля версий на примере **Git**.
+Данная лабораторная работа посвещена изучению систем автоматизации сборки проекта на примере **CMake**
 
-```bash
-$ open https://git-scm.com
+```ShellSession
+$ open https://cmake.org/
 ```
 
 ## Tasks
 
-- [x] 1. Создать публичный репозиторий с названием **lab03** и с лиценцией **MIT**
-- [x] 2. Ознакомиться со ссылками учебного материала
-- [x] 3. Выполнить инструкцию учебного материала
-- [x] 4. Составить отчет и отправить ссылку личным сообщением в **Slack**
+- [ ] 1. Создать публичный репозиторий с названием **lab04** на сервисе **GitHub**
+- [ ] 2. Ознакомиться со ссылками учебного материала
+- [ ] 3. Выполнить инструкцию учебного материала
+- [ ] 4. Составить отчет и отправить ссылку личным сообщением в **Slack**
 
 ## Tutorial
 
 ```ShellSession
 $ export GITHUB_USERNAME=<имя_пользователя>
-$ export GITHUB_EMAIL=<адрес_почтового_ящика>
-$ alias edit=<nano|vi|vim|subl>
 ```
 
 ```ShellSession
 $ cd ${GITHUB_USERNAME}/workspace
+$ pushd .
 $ source scripts/activate
 ```
 
 ```ShellSession
-$ mkdir projects/lab03 && cd projects/lab03
-$ git init
-$ git config --global user.name ${GITHUB_USERNAME}
-$ git config --global user.email ${GITHUB_EMAIL}
-$ git config -e --global
-$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab03.git
-$ git pull origin master
-$ touch README.md
-$ git status
-$ git add README.md
-$ git commit -m"added README.md"
+$ git clone https://github.com/${GITHUB_USERNAME}/lab03.git projects/lab04
+$ cd projects/lab04
+$ git remote remove origin
+$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab04.git
+```
+
+```ShellSession
+$ g++ -I./include -std=c++11 -c sources/print.cpp
+$ ls print.o
+$ nm print.o | grep print
+$ ar rvs print.a print.o
+$ file print.a
+$ g++ -I./include -std=c++11 -c examples/example1.cpp
+$ ls example1.o
+$ g++ example1.o print.a -o example1
+$ ./example1 && echo
+```
+
+```ShellSession
+$ g++ -I./include -std=c++11 -c examples/example2.cpp
+$ nm example2.o
+$ g++ example2.o print.a -o example2
+$ ./example2
+$ cat log.txt && echo
+```
+
+```ShellSession
+$ rm -rf example1.o example2.o print.o 
+$ rm -rf print.a 
+$ rm -rf example1 example2
+$ rm -rf log.txt
+```
+
+```ShellSession
+$ cat > CMakeLists.txt <<EOF
+cmake_minimum_required(VERSION 3.0)
+project(print)
+EOF
+```
+
+```ShellSession
+$ cat >> CMakeLists.txt <<EOF
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+EOF
+```
+
+```ShellSession
+$ cat >> CMakeLists.txt <<EOF
+add_library(print STATIC \${CMAKE_CURRENT_SOURCE_DIR}/sources/print.cpp)
+EOF
+```
+
+```ShellSession
+$ cat >> CMakeLists.txt <<EOF
+include_directories(\${CMAKE_CURRENT_SOURCE_DIR}/include)
+EOF
+```
+
+```ShellSession
+$ cmake -H. -B_build
+$ cmake --build _build
+```
+
+```ShellSession
+$ cat >> CMakeLists.txt <<EOF
+
+add_executable(example1 \${CMAKE_CURRENT_SOURCE_DIR}/examples/example1.cpp)
+add_executable(example2 \${CMAKE_CURRENT_SOURCE_DIR}/examples/example2.cpp)
+EOF
+```
+
+```ShellSession
+$ cat >> CMakeLists.txt <<EOF
+
+target_link_libraries(example1 print)
+target_link_libraries(example2 print)
+EOF
+```
+
+```ShellSession
+$ cmake --build _build
+$ cmake --build _build --target print
+$ cmake --build _build --target example1
+$ cmake --build _build --target example2
+```
+
+```ShellSession
+$ ls -la _build/libprint.a
+$ _build/example1 && echo
+hello
+$ _build/example2
+$ cat log.txt && echo
+hello
+$ rm -rf log.txt
+```
+
+```ShellSession
+$ git clone https://github.com/tp-labs/lab04 tmp
+$ mv -f tmp/CMakeLists.txt .
+$ rm -rf tmp
+```
+
+```ShellSession
+$ cat CMakeLists.txt
+$ cmake -H. -B_build -DCMAKE_INSTALL_PREFIX=_install
+$ cmake --build _build --target install
+$ tree _install
+```
+
+```ShellSession
+$ git add CMakeLists.txt
+$ git commit -m"added CMakeLists.txt"
 $ git push origin master
 ```
 
-Добавить на сервисе **GitHub** в репозитории **lab03** файл **.gitignore**
-со следующем содержимом:
-
-```ShellSession
-*build*/
-*install*/
-*.swp
-.idea/
-```
-
-```ShellSession
-$ git pull origin master
-$ git log
-```
-
-```ShellSession
-$ mkdir sources
-$ mkdir include
-$ mkdir examples
-$ cat > sources/print.cpp <<EOF
-#include <print.hpp>
-
-void print(const std::string& text, std::ostream& out) {
-  out << text;
-}
-
-void print(const std::string& text, std::ofstream& out) {
-  out << text;
-}
-EOF
-```
-
-```ShellSession
-$ cat > include/print.hpp <<EOF
-#include <string>
-#include <fstream>
-#include <iostream>
-
-void print(const std::string& text, std::ostream& out = std::cout);
-void print(const std::string& text, std::ofstream& out);
-EOF
-```
-
-```ShellSession
-$ cat > examples/example1.cpp <<EOF
-#include <print.hpp>
-
-int main(int argc, char** argv) {
-  print("hello");
-}
-EOF
-```
-
-```ShellSession
-$ cat > examples/example2.cpp <<EOF
-#include <fstream>
-#include <print.hpp>
-
-int main(int argc, char** argv) {
-  std::ofstream file("log.txt");
-  print(std::string("hello"), file);
-}
-EOF
-```
-
-```ShellSession
-$ edit README.md
-```
-
-```ShellSession
-$ git status
-$ git add .
-$ git commit -m"added sources"
-$ git push origin master
-```
 
 ## Links
 
-- [GitHub](https://github.com)
-- [Bitbucket](https://bitbucket.org)
-- [Gitlab](https://about.gitlab.com)
-- [LearnGitBranching](http://learngitbranching.js.org/)
+- [Autotools](http://www.gnu.org/software/automake/manual/html_node/Autotools-Introduction.html)
+- [CMake](https://cgold.readthedocs.io/en/latest/index.html)
 
 ```
 Copyright (c) 2017 Братья Вершинины
