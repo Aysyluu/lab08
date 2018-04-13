@@ -1,0 +1,9 @@
+/home/aysylu/Aysyluu/workspace/projects/lab06/_build/CMakeFiles/rebuild_cache.dir
+/home/aysylu/Aysyluu/workspace/projects/lab06/_build/CMakeFiles/edit_cache.dir
+/home/aysylu/Aysyluu/workspace/projects/lab06/_build/CMakeFiles/list_install_components.dir
+/home/aysylu/Aysyluu/workspace/projects/lab06/_build/CMakeFiles/install.dir
+/home/aysylu/Aysyluu/workspace/projects/lab06/_build/CMakeFiles/print.dir
+/home/aysylu/Aysyluu/workspace/projects/lab06/_build/CMakeFiles/test.dir
+/home/aysylu/Aysyluu/workspace/projects/lab06/_build/CMakeFiles/check.dir
+/home/aysylu/Aysyluu/workspace/projects/lab06/_build/CMakeFiles/install/strip.dir
+/home/aysylu/Aysyluu/workspace/projects/lab06/_build/CMakeFiles/install/local.dir
